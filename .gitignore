@@ -1,0 +1,19 @@
+# Lua compiled files
+*.lua-compiled
+*.luac
+
+# Popular Lua LSP server local files
+.luarc.json
+.luacheckrc
+
+# System files
+.DS_Store
+*~
+*.swp
+*.swo
+
+# Optional runtime files
+.netrwhist
+
+# Popular package managers
+packer_compiled.lua
