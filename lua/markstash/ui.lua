@@ -68,6 +68,8 @@ end
 
 function M.setup_keymaps()
   local opts = { buffer = M.buf_id, silent = true, noremap = true }
+
+  -- Navigation
   vim.keymap.set("n", "j", function()
     M.move_cursor("down")
   end, opts)
@@ -77,6 +79,24 @@ function M.setup_keymaps()
   vim.keymap.set("n", "<CR>", function()
     M.jump_to_mark()
   end, opts)
+
+  -- Get existing marks from our lines
+  local existing_marks = {}
+  for _, line_num in ipairs(M.selectable_lines) do
+    local line = vim.api.nvim_buf_get_lines(M.buf_id, line_num - 1, line_num, false)[1]
+    local mark = line:match("^([`'a-zA-Z])")
+    if mark and mark ~= "j" and mark ~= "k" then
+      existing_marks[mark] = true
+    end
+  end
+
+  -- Map only existing marks
+  for mark in pairs(existing_marks) do
+    vim.keymap.set("n", mark, function()
+      M.close()
+      vim.cmd("normal! `" .. mark)
+    end, opts)
+  end
 end
 
 function M.jump_to_mark()
