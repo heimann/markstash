@@ -6,6 +6,15 @@ M.buf_id = nil
 
 M.selectable_lines = {} -- Will store line numbers that contain marks
 
+local function truncate_path(path)
+  local parts = vim.split(path, "/")
+  -- Keep last 3 path components
+  if #parts > 3 then
+    return ".../" .. table.concat({ parts[#parts - 2], parts[#parts - 1], parts[#parts] }, "/")
+  end
+  return path
+end
+
 -- Window creation with some nice defaults
 function M.create_window()
   -- Create a new buffer for our window
@@ -79,6 +88,9 @@ function M.setup_keymaps()
   vim.keymap.set("n", "<CR>", function()
     M.jump_to_mark()
   end, opts)
+  vim.keymap.set("n", "<Esc>", function()
+    M.close()
+  end, opts)
 
   -- Get existing marks from our lines
   local existing_marks = {}
@@ -130,7 +142,8 @@ function M.update_content(window_marks, global_marks)
 
   -- Add window marks
   for _, mark in ipairs(window_marks) do
-    table.insert(lines, string.format("%s  %s:%s", mark.mark, mark.file, mark.line))
+    local display_path = truncate_path(mark.file)
+    table.insert(lines, string.format("%s  %s:%s", mark.mark, display_path, mark.line))
     table.insert(M.selectable_lines, current_line)
     current_line = current_line + 1
   end
